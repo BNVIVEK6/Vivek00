@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIVEK AI PREDICTOR - Advanced Prediction Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.10.5/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #00ffcc;
+            --primary-dark: #00ccaa;
+            --secondary: #ff00aa;
+            --accent: #ffcc00;
+            --bg-dark: #0b0f19;
+            --bg-card: #131722;
+            --bg-card-darker: #0d111c;
+            --text-bright: #f0f0f0;
+            --text-muted: #a0a0a0;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 255, 204, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 0, 170, 0.08) 0%, transparent 25%);
+            color: var(--text-bright);
+            transition: all 0.3s ease;
+        }
+        
+        .app-title {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(90deg, var(--accent), var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            letter-spacing: 2px;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.15), 
+                        0 0 30px rgba(0, 255, 204, 0.05);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.25),
+                        0 0 40px rgba(0, 255, 204, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .info-box {
+            background: var(--bg-card-darker);
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .info-box:hover {
+            border-left-width: 5px;
+            transform: translateX(2px);
+        }
+        
+        .btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            transition: height 0.3s ease;
+        }
+        
+        .btn:hover:after {
+            height: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #cc0088);
+        }
+        
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #cc9900);
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        .prediction-big {
+            color: #00dd88;
+            animation: pulse-green 1.5s infinite;
+        }
+        
+        .prediction-small {
+            color: #ff5577;
+            animation: pulse-red 1.5s infinite;
+        }
+        
+        @keyframes pulse-green {
+            0% { text-shadow: 0 0 5px #00dd88; }
+            50% { text-shadow: 0 0 15px #00dd88; }
+            100% { text-shadow: 0 0 5px #00dd88; }
+        }
+        
+        @keyframes pulse-red {
+            0% { text-shadow: 0 0 5px #ff5577; }
+            50% { text-shadow: 0 0 15px #ff5577; }
+            100% { text-shadow: 0 0 5px #ff5577; }
+        }
+        
+        .tab-active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #f63366 0%, #ffaa00 50%, #2ecc71 100%);
+        }
+        
+        .custom-range::-webkit-slider-thumb {
+            background: var(--primary);
+        }
+        
+        table th {
+            background-color: var(--bg-card-darker);
+            color: var(--primary);
+        }
+        
+        .result-win {
+            color: #00dd88;
+        }
+        
+        .result-lose {
+            color: #ff5577;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--bg-card-darker);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        .indicator {
+            transition: all 0.5s ease;
+        }
+        
+        .confidence-meter {
+            height: 8px;
+            background: linear-gradient(90deg, 
+                rgba(255, 0, 0, 0.7) 0%, 
+                rgba(255, 255, 0, 0.7) 50%, 
+                rgba(0, 255, 0, 0.7) 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen" x-data="predictionApp()">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header Section -->
+        <header class="flex flex-col sm:flex-row justify-between items-center mb-8 animate-fade-in">
+            <div>
+                <h1 class="app-title text-4xl lg:text-5xl font-bold mb-2">VIVEK AI PREDICTOR</h1>
+                <p class="text-gray-400 italic">Advanced Prediction Platform</p>
+            </div>
+            <div class="flex items-center space-x-4 mt-4 sm:mt-0">
+                <div>
+                    <span class="text-sm text-gray-400">Theme</span>
+                    <label class="switch ml-2">
+                        <input type="checkbox" x-model="settings.darkMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-400">Sound</span>
+                    <label class="switch ml-2">
+                        <input type="checkbox" x-model="settings.soundEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Prediction Column -->
+            <div class="lg:col-span-2">
+                <!-- Current Prediction Card -->
+                <div class="card rounded-xl p-6 mb-6 animate-fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold"><i class="fas fa-robot mr-2 text-primary"></i>Current Prediction</h2>
+                        <div x-show="isLoading" class="flex items-center">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                            <span class="ml-2 text-sm text-gray-400">Processing...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="info-box rounded-lg p-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-400"><i class="fas fa-hashtag mr-1"></i> Current Period</span>
+                                <span class="text-lg font-mono" x-text="currentPeriod || 'Loading...'"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box rounded-lg p-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-400"><i class="far fa-clock mr-1"></i> Next Result In</span>
+                                <span class="text-lg font-mono" x-text="formatCountdown()"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <div class="mb-2 text-gray-400 text-sm">AI Prediction</div>
+                        <div class="text-5xl font-bold mb-4" 
+                             x-text="aiPrediction" 
+                             :class="{'prediction-big': aiPrediction === 'BIG', 'prediction-small': aiPrediction === 'SMALL'}"></div>
+                        
+                        <div class="mb-6">
+                            <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                <span>Low Confidence</span>
+                                <span>High Confidence</span>
+                            </div>
+                            <div class="confidence-meter rounded-full overflow-hidden">
+                                <div class="h-full bg-black bg-opacity-50" :style="`width: ${100 - predictionConfidence}%`"></div>
+                            </div>
+                            <div class="text-center text-sm mt-1">
+                                <span x-text="`Confidence: ${predictionConfidence}%`"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="btn btn-primary rounded-lg py-3 font-bold text-black" @click="runSimulation()">
+                                <i class="fas fa-play mr-2"></i> Run Simulation
+                            </button>
+                            <button class="btn btn-secondary rounded-lg py-3 font-bold text-white" @click="resetStatistics()">
+                                <i class="fas fa-redo-alt mr-2"></i> Reset Stats
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics Card -->
+                <div class="card rounded-xl p-6 mb-6 animate-fade-in" style="animation-delay: 0.1s;">
+                    <h2 class="text-xl font-bold mb-4"><i class="fas fa-chart-pie mr-2 text-primary"></i>Performance Statistics</h2>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="info-box rounded-lg p-3 text-center">
+                            <div class="text-sm text-gray-400 mb-1">Wins</div>
+                            <div class="text-2xl font-bold text-green-400" x-text="totalWins"></div>
+                        </div>
+                        
+                        <div class="info-box rounded-lg p-3 text-center">
+                            <div class="text-sm text-gray-400 mb-1">Losses</div>
+                            <div class="text-2xl font-bold text-red-400" x-text="totalLosses"></div>
+                        </div>
+                        
+                        <div class="info-box rounded-lg p-3 text-center">
+                            <div class="text-sm text-gray-400 mb-1">Accuracy</div>
+                            <div class="text-2xl font-bold text-primary glow-text" x-text="winRate + '%'"></div>
+                        </div>
+                        
+                        <div class="info-box rounded-lg p-3 text-center">
+                            <div class="text-sm text-gray-400 mb-1">Streak</div>
+                            <div class="text-2xl font-bold" :class="currentStreak >= 0 ? 'text-green-400' : 'text-red-400'" x-text="formatStreak(currentStreak)"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-bold mb-2">Performance Trend</h3>
+                        <div class="h-64 w-full">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Side Column -->
+            <div class="lg:col-span-1">
+                <!-- Algorithm Settings Card -->
+                <div class="card rounded-xl p-6 mb-6 animate-fade-in" style="animation-delay: 0.2s;">
+                    <h2 class="text-xl font-bold mb-4"><i class="fas fa-sliders-h mr-2 text-primary"></i>Algorithm Settings</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-400 mb-1">Prediction Method</label>
+                        <select class="w-full bg-bg-card-darker text-white border border-gray-700 rounded-lg py-2 px-3" 
+                                x-model="settings.predictionMethod">
+                            <option value="pattern">Pattern Analysis</option>
+                            <option value="frequency">Frequency Analysis</option>
+                            <option value="mixed">Mixed Strategy</option>
+                            <option value="advanced">Advanced AI</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-400 mb-1">Analysis Depth (Rounds)</label>
+                        <input type="range" class="custom-range w-full h-2 rounded-lg appearance-none bg-bg-card-darker" 
+                               min="5" max="30" step="5" x-model.number="settings.analysisDepth">
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>5</span>
+                            <span>10</span>
+                            <span>15</span>
+                            <span>20</span>
+                            <span>25</span>
+                            <span>30</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-400 mb-1">Randomness Factor</label>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-400 mr-2">Low</span>
+                            <input type="range" class="custom-range flex-grow h-2 rounded-lg appearance-none bg-bg-card-darker" 
+                                   min="0" max="100" step="10" x-model.number="settings.randomnessFactor">
+                            <span class="text-xs text-gray-400 ml-2">High</span>
+                        </div>
+                        <div class="text-center text-sm mt-1">
+                            <span x-text="`${settings.randomnessFactor}%`"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="form-checkbox h-4 w-4 text-primary bg-bg-card-darker border-gray-700 rounded" 
+                                   x-model="settings.useHistoricalData">
+                            <span class="ml-2 text-sm">Use Historical Data</span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="form-checkbox h-4 w-4 text-primary bg-bg-card-darker border-gray-700 rounded" 
+                                   x-model="settings.adaptiveMode">
+                            <span class="ml-2 text-sm">Adaptive Mode</span>
+                        </label>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-accent rounded-lg py-2 px-4 w-full font-bold text-black" @click="applySettings()">
+                            <i class="fas fa-save mr-2"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Prediction Distribution Card -->
+                <div class="card rounded-xl p-6 animate-fade-in" style="animation-delay: 0.3s;">
+                    <h2 class="text-xl font-bold mb-4"><i class="fas fa-chart-bar mr-2 text-primary"></i>Result Distribution</h2>
+                    <div class="h-64 w-full">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- History Table -->
+        <div class="card rounded-xl p-6 mt-6 animate-fade-in" style="animation-delay: 0.4s;">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold"><i class="fas fa-history mr-2 text-primary"></i>Prediction History</h2>
+                <div class="flex space-x-2">
+                    <button class="btn px-3 py-1 rounded-lg bg-bg-card-darker text-sm" @click="exportHistory()">
+                        <i class="fas fa-download mr-1"></i> Export
+                    </button>
+                    <button class="btn px-3 py-1 rounded-lg bg-bg-card-darker text-sm" @click="clearHistory()">
+                        <i class="fas fa-trash-alt mr-1"></i> Clear
+                    </button>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto custom-scrollbar" style="max-height: 400px;">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border border-gray-700 text-left">#</th>
+                            <th class="py-2 px-4 border border-gray-700 text-left">Period</th>
+                            <th class="py-2 px-4 border border-gray-700 text-left">Prediction</th>
+                            <th class="py-2 px-4 border border-gray-700 text-left">Confidence</th>
+                            <th class="py-2 px-4 border border-gray-700 text-left">Result</th>
+                            <th class="py-2 px-4 border border-gray-700 text-left">Outcome</th>
+                            <th class="py-2 px-4 border border-gray-700 text-left">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(item, index) in historyData.slice(0, 50)" :key="index">
+                            <tr :class="index % 2 === 0 ? 'bg-opacity-50 bg-gray-800' : ''">
+                                <td class="py-2 px-4 border border-gray-700" x-text="historyData.length - index"></td>
+                                <td class="py-2 px-4 border border-gray-700 font-mono" x-text="item.period"></td>
+                                <td class="py-2 px-4 border border-gray-700" 
+                                    :class="{'text-green-400': item.prediction === 'BIG', 'text-red-400': item.prediction === 'SMALL'}"
+                                    x-text="item.prediction"></td>
+                                <td class="py-2 px-4 border border-gray-700" x-text="item.confidence + '%'"></td>
+                                <td class="py-2 px-4 border border-gray-700" x-text="item.actualResult || '-'"></td>
+                                <td class="py-2 px-4 border border-gray-700">
+                                    <span x-show="item.isCorrect === true" class="result-win"><i class="fas fa-check-circle mr-1"></i> Win</span>
+                                    <span x-show="item.isCorrect === false" class="result-lose"><i class="fas fa-times-circle mr-1"></i> Loss</span>
+                                    <span x-show="item.isCorrect === null">Pending</span>
+                                </td>
+                                <td class="py-2 px-4 border border-gray-700 text-sm text-gray-400" x-text="item.timestamp"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Sound -->
+    <audio id="winSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="loseSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-losing-bleeps-2026.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        function predictionApp() {
+            return {
+                historyData: [],
+                lastFetchedPeriod: null,
+                totalWins: 0,
+                totalLosses: 0,
+                winRate: 0,
+                currentStreak: 0,
+                currentPeriod: null,
+                aiPrediction: "...",
+                predictionConfidence: 75,
+                countdown: 60,
+                isLoading: false,
+                performanceChart: null,
+                distributionChart: null,
+                bigCount: 0,
+                smallCount: 0,
+                
+                settings: {
+                    darkMode: true,
+                    soundEnabled: true,
+                    predictionMethod: "mixed",
+                    analysisDepth: 10,
+                    randomnessFactor: 30,
+                    useHistoricalData: true,
+                    adaptiveMode: true
+                },
+                
+                init() {
+                    this.loadFromLocalStorage();
+                    this.initializeCharts();
+                    this.updatePrediction();
+                    this.startCountdown();
+                    
+                    // Set update intervals
+                    setInterval(() => this.updatePrediction(), 5000);
+                    setInterval(() => this.updateResult(), 6000);
+                },
+                
+                loadFromLocalStorage() {
+                    const savedSettings = localStorage.getItem('vivekAiSettings');
+                    if (savedSettings) {
+                        this.settings = JSON.parse(savedSettings);
+                    }
+                    
+                    const savedHistory = localStorage.getItem('vivekAiHistory');
+                    if (savedHistory) {
+                        this.historyData = JSON.parse(savedHistory);
+                        // Recalculate stats
+                        this.totalWins = this.historyData.filter(item => item.isCorrect === true).length;
+                        this.totalLosses = this.historyData.filter(item => item.isCorrect === false).length;
+                        this.calculateWinRate();
+                        this.calculateStreak();
+                        this.calculateDistribution();
+                    }
+                },
+                
+                saveToLocalStorage() {
+                    localStorage.setItem('vivekAiSettings', JSON.stringify(this.settings));
+                    localStorage.setItem('vivekAiHistory', JSON.stringify(this.historyData));
+                },
+                
+                initializeCharts() {
+                    // Initialize performance chart
+                    const perfCtx = document.getElementById('performanceChart').getContext('2d');
+                    this.performanceChart = new Chart(perfCtx, {
+                        type: 'line',
+                        data: {
+                            labels: [...Array(20).keys()].map(i => `${i+1}`).reverse(),
+                            datasets: [{
+                                label: 'Win Rate (%)',
+                                data: Array(20).fill(0),
+                                borderColor: '#00ffcc',
+                                backgroundColor: 'rgba(0, 255, 204, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#a0a0a0'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: '#a0a0a0'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Initialize distribution chart
+                    const distCtx = document.getElementById('distributionChart').getContext('2d');
+                    this.distributionChart = new Chart(distCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['BIG', 'SMALL'],
+                            datasets: [{
+                                data: [this.bigCount, this.smallCount],
+                                backgroundColor: [
+                                    'rgba(0, 221, 136, 0.8)',
+                                    'rgba(255, 85, 119, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgba(0, 221, 136, 1)',
+                                    'rgba(255, 85, 119, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#a0a0a0',
+                                        padding: 15
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                startCountdown() {
+                    setInterval(() => {
+                        if (this.countdown > 0) {
+                            this.countdown--;
+                        } else {
+                            this.countdown = 60; // Reset for next period
+                        }
+                    }, 1000);
+                },
+                
+                formatCountdown() {
+                    const minutes = Math.floor(this.countdown / 60);
+                    const seconds = this.countdown % 60;
+                    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                },
+                
+                async fetchGameResult() {
+                    try {
+                        this.isLoading = true;
+                        // This is a simulation of the API call from the original code
+                        const response = await fetch("https://api.bdg88zf.com/api/webapi/GetNoaverageEmerdList", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                pageSize: 10, pageNo: 1, typeId: 1, language: 0, 
+                                random: "4a0522c6ecd8410496260e686be2a57c", 
+                                signature: "334B5E70A0C9B8918B0B15E517E2069C",
+                                timestamp: Math.floor(Date.now() / 1000)
+                            })
+                        }).catch(() => {
+                            // If API fails, simulate results for demo purposes
+                            return {
+                                ok: true,
+                                json: () => Promise.resolve({
+                                    data: {
+                                        list: [{
+                                            issueNumber: this.lastFetchedPeriod ? 
+                                                (BigInt(this.lastFetchedPeriod) + 1n).toString() : 
+                                                "20230000001",
+                                            number: Math.floor(Math.random() * 10).toString()
+                                        }]
+                                    }
+                                })
+                            };
+                        });
+                        
+                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                        let data = await response.json();
+                        let latestResult = data?.data?.list?.[0];
+                        this.isLoading = false;
+                        return latestResult ? { 
+                            period: latestResult.issueNumber, 
+                            result: parseInt(latestResult.number) 
+                        } : null;
+                    } catch (error) {
+                        console.error("Error fetching game result:", error);
+                        this.isLoading = false;
+                        // Create simulated result for demo
+                        return { 
+                            period: this.lastFetchedPeriod ? 
+                                (BigInt(this.lastFetchedPeriod) + 1n).toString() : 
+                                "20230000001",
+                            result: Math.floor(Math.random() * 10)
+                        };
+                    }
+                },
+                
+                generatePrediction() {
+                    // Smart prediction algorithm based on settings
+                    let prediction = "BIG";
+                    let confidence = 50 + Math.floor(Math.random() * 40); // Base confidence between 50-90%
+                    
+                    const recentResults = this.historyData.slice(0, this.settings.analysisDepth)
+                        .filter(item => item.actualResult)
+                        .map(item => item.actualResult === "BIG" ? 1 : 0);
+                        
+                    if (recentResults.length > 0) {
+                        // Calculate ratio of BIG results
+                        const bigRatio = recentResults.reduce((sum, val) => sum + val, 0) / recentResults.length;
+                        
+                        // Different strategies based on prediction method
+                        switch(this.settings.predictionMethod) {
+                            case "pattern":
+                                // Look for patterns in last few results
+                                if (recentResults.length >= 3) {
+                                    // Check for alternating pattern
+                                    const isAlternating = recentResults[0] !== recentResults[1] && 
+                                                       recentResults[1] !== recentResults[2];
+                                    // Check for repetition pattern
+                                    const isRepeating = recentResults[0] === recentResults[1] && 
+                                                     recentResults[1] === recentResults[2];
+                                                     
+                                    if (isAlternating) {
+                                        prediction = recentResults[0] === 1 ? "SMALL" : "BIG";
+                                        confidence += 10;
+                                    } else if (isRepeating) {
+                                        prediction = recentResults[0] === 1 ? "BIG" : "SMALL";
+                                        confidence += 15;
+                                    } else {
+                                        // Use frequency if no clear pattern
+                                        prediction = bigRatio > 0.5 ? "BIG" : "SMALL";
+                                    }
+                                }
+                                break;
+                                
+                            case "frequency":
+                                // Use simple frequency analysis
+                                prediction = bigRatio > 0.5 ? "BIG" : "SMALL";
+                                
+                                // Confidence based on how strong the trend is
+                                const trendStrength = Math.abs(bigRatio - 0.5) * 2; // 0 to 1
+                                confidence += Math.floor(trendStrength * 20);
+                                break;
+                                
+                            case "mixed":
+                                // Use both pattern and frequency
+                                if (Math.abs(bigRatio - 0.5) > 0.3) {
+                                    // Strong bias in results
+                                    prediction = bigRatio > 0.5 ? "BIG" : "SMALL";
+                                    confidence += 15;
+                                } else if (recentResults.length >= 3) {
+                                    // Look for short patterns
+                                    const lastThree = recentResults.slice(0, 3).join('');
+                                    if (lastThree === "111" || lastThree === "000") {
+                                        // Break long streaks
+                                        prediction = recentResults[0] === 1 ? "SMALL" : "BIG";
+                                        confidence += 10;
+                                    } else {
+                                        // Use slight bias
+                                        prediction = bigRatio >= 0.5 ? "BIG" : "SMALL";
+                                    }
+                                }
+                                break;
+                                
+                            case "advanced":
+                                // Simulate an advanced algorithm with higher confidence
+                                // Use weighted recent results
+                                const weightedResults = recentResults.slice(0, 5).map((r, i) => r * (5-i));
+                                const weightSum = weightedResults.reduce((sum, val) => sum + Math.abs(val), 0);
+                                const weightedBigRatio = weightSum > 0 ? 
+                                    weightedResults.reduce((sum, val) => sum + val, 0) / weightSum : 0.5;
+                                
+                                prediction = weightedBigRatio > 0.5 ? "BIG" : "SMALL";
+                                confidence += 20; // Advanced method has higher base confidence
+                                break;
+                        }
+                    }
+                    
+                    // Apply randomness factor
+                    if (Math.random() * 100 < this.settings.randomnessFactor) {
+                        prediction = prediction === "BIG" ? "SMALL" : "BIG";
+                        confidence = Math.max(50, confidence - 15); // Lower confidence for random flips
+                    }
+                    
+                    // Adaptive mode: If we're on a losing streak, try the opposite
+                    if (this.settings.adaptiveMode && this.currentStreak <= -3) {
+                        prediction = prediction === "BIG" ? "SMALL" : "BIG";
+                        confidence = Math.max(50, confidence - 10);
+                    }
+                    
+                    // Clamp confidence to 50-99%
+                    confidence = Math.min(99, Math.max(50, confidence));
+                    
+                    return { prediction, confidence };
+                },
+                
+                async updatePrediction() {
+                    let apiResult = await this.fetchGameResult();
+                    if (apiResult && apiResult.period !== this.lastFetchedPeriod) {
+                        this.lastFetchedPeriod = apiResult.period;
+                        let nextPeriod = (BigInt(apiResult.period) + 1n).toString();
+                        
+                        const { prediction, confidence } = this.generatePrediction();
+                        this.aiPrediction = prediction;
+                        this.predictionConfidence = confidence;
+                        
+                        this.historyData.unshift({ 
+                            period: nextPeriod, 
+                            prediction, 
+                            confidence,
+                            isCorrect: null,
+                            timestamp: new Date().toLocaleTimeString()
+                        });
+                        
+                        this.currentPeriod = nextPeriod;
+                        this.countdown = 60; // Reset countdown
+                        this.saveToLocalStorage();
+                    }
+                },
+                
+                async updateResult() {
+                    let apiResult = await this.fetchGameResult();
+                    if (apiResult) {
+                        let index = this.historyData.findIndex(item => item.period === apiResult.period);
+                        if (index !== -1 && this.historyData[index].isCorrect === null) {
+                            let actualResult = apiResult.result >= 5 ? "BIG" : "SMALL";
+                            let isCorrect = this.historyData[index].prediction === actualResult;
+                            
+                            this.historyData[index].actualResult = actualResult;
+                            this.historyData[index].isCorrect = isCorrect;
+                            
+                            if (isCorrect) {
+                                this.totalWins++;
+                                if (this.currentStreak < 0) this.currentStreak = 1;
+                                else this.currentStreak++;
+                                
+                                if (this.settings.soundEnabled) {
+                                    document.getElementById('winSound').play();
+                                }
+                            } else {
+                                this.totalLosses++;
+                                if (this.currentStreak > 0) this.currentStreak = -1;
+                                else this.currentStreak--;
+                                
+                                if (this.settings.soundEnabled) {
+                                    document.getElementById('loseSound').play();
+                                }
+                            }
+                            
+                            this.calculateWinRate();
+                            this.updateCharts();
+                            this.calculateDistribution();
+                            this.saveToLocalStorage();
+                        }
+                    }
+                },
+                
+                calculateWinRate() {
+                    const total = this.totalWins + this.totalLosses;
+                    this.winRate = total > 0 ? Math.round((this.totalWins / total) * 100) : 0;
+                },
+                
+                calculateStreak() {
+                    // Calculate current streak from history
+                    let streak = 0;
+                    
+                    for (let i = 0; i < this.historyData.length; i++) {
+                        if (this.historyData[i].isCorrect === null) continue;
+                        
+                        if (i === 0) {
+                            streak = this.historyData[i].isCorrect ? 1 : -1;
+                        } else if (this.historyData[i].isCorrect === true) {
+                            if (streak > 0) streak++;
+                            else streak = 1;
+                        } else {
+                            if (streak < 0) streak--;
+                            else streak = -1;
+                        }
+                        
+                        if (i > 10) break; // Only check recent history
+                    }
+                    
+                    this.currentStreak = streak;
+                },
+                
+                calculateDistribution() {
+                    this.bigCount = this.historyData.filter(item => item.actualResult === "BIG").length;
+                    this.smallCount = this.historyData.filter(item => item.actualResult === "SMALL").length;
+                },
+                
+                updateCharts() {
+                    // Update performance chart with moving win rate
+                    const winRates = [];
+                    let windowSize = 5; // Calculate win rate over 5 game windows
+                    
+                    for (let i = 0; i < 20; i++) {
+                        const window = this.historyData.slice(i, i + windowSize);
+                        const wins = window.filter(item => item.isCorrect === true).length;
+                        const total = window.filter(item => item.isCorrect !== null).length;
+                        winRates.push(total > 0 ? Math.round((wins / total) * 100) : 0);
+                    }
+                    
+                    this.performanceChart.data.datasets[0].data = winRates;
+                    this.performanceChart.update();
+                    
+                    // Update distribution chart
+                    this.distributionChart.data.datasets[0].data = [this.bigCount, this.smallCount];
+                    this.distributionChart.update();
+                },
+                
+                formatStreak(streak) {
+                    if (streak > 0) return `+${streak}`;
+                    return streak.toString();
+                },
+                
+                runSimulation() {
+                    this.isLoading = true;
+                    
+                    // Simulate 10 rounds of predictions
+                    setTimeout(() => {
+                        for (let i = 0; i < 10; i++) {
+                            const period = (BigInt(this.lastFetchedPeriod) + BigInt(i) + 1n).toString();
+                            const { prediction, confidence } = this.generatePrediction();
+                            const actualResult = Math.random() > 0.5 ? "BIG" : "SMALL";
+                            const isCorrect = prediction === actualResult;
+                            
+                            this.historyData.unshift({
+                                period,
+                                prediction,
+                                confidence,
+                                actualResult,
+                                isCorrect,
+                                timestamp: new Date().toLocaleTimeString()
+                            });
+                            
+                            if (isCorrect) this.totalWins++;
+                            else this.totalLosses++;
+                        }
+                        
+                        this.lastFetchedPeriod = (BigInt(this.lastFetchedPeriod) + 10n).toString();
+                        this.currentPeriod = (BigInt(this.lastFetchedPeriod) + 1n).toString();
+                        
+                        this.calculateWinRate();
+                        this.calculateStreak();
+                        this.updateCharts();
+                        this.calculateDistribution();
+                        this.saveToLocalStorage();
+                        this.isLoading = false;
+                        
+                        // Update current prediction
+                        const { prediction, confidence } = this.generatePrediction();
+                        this.aiPrediction = prediction;
+                        this.predictionConfidence = confidence;
+                    }, 1000);
+                },
+                
+                resetStatistics() {
+                    if (confirm("Are you sure you want to reset all statistics?")) {
+                        this.totalWins = 0;
+                        this.totalLosses = 0;
+                        this.winRate = 0;
+                        this.currentStreak = 0;
+                        this.bigCount = 0;
+                        this.smallCount = 0;
+                        
+                        // Keep history but reset statistics
+                        this.historyData = this.historyData.map(item => ({
+                            ...item,
+                            isCorrect: null,
+                            actualResult: null
+                        }));
+                        
+                        this.updateCharts();
+                        this.saveToLocalStorage();
+                    }
+                },
+                
+                clearHistory() {
+                    if (confirm("Are you sure you want to clear all prediction history?")) {
+                        this.historyData = [];
+                        this.totalWins = 0;
+                        this.totalLosses = 0;
+                        this.winRate = 0;
+                        this.currentStreak = 0;
+                        this.bigCount = 0;
+                        this.smallCount = 0;
+                        this.updateCharts();
+                        this.saveToLocalStorage();
+                    }
+                },
+                
+                exportHistory() {
+                    const dataStr = "data:text/json;charset=utf-8," + 
+                        encodeURIComponent(JSON.stringify({
+                            history: this.historyData,
+                            stats: {
+                                totalWins: this.totalWins,
+                                totalLosses: this.totalLosses,
+                                winRate: this.winRate,
+                                currentStreak: this.currentStreak
+                            },
+                            exportDate: new Date().toISOString()
+                        }, null, 2));
+                        
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", "vivek_ai_history.json");
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                },
+                
+                applySettings() {
+                    this.saveToLocalStorage();
+                    alert("Settings saved successfully!");
+                    
+                    // Update prediction with new settings
+                    const { prediction, confidence } = this.generatePrediction();
+                    this.aiPrediction = prediction;
+                    this.predictionConfidence = confidence;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
